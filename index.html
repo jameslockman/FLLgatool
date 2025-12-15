@@ -121,6 +121,17 @@
         </div>
     </div>
 
+    <!-- Configuration: Load config.js if it exists (for API key injection) -->
+    <script>
+        // Check if config.js exists and load it
+        const configScript = document.createElement('script');
+        configScript.src = 'config.js';
+        configScript.onerror = function() {
+            // Config file doesn't exist, that's okay
+            console.log('No config.js found, using manual API key entry');
+        };
+        document.head.appendChild(configScript);
+    </script>
     <script src="app.js"></script>
 </body>
 </html>

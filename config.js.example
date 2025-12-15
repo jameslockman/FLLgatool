@@ -1,0 +1,8 @@
+// Configuration file
+// Copy this to config.js and set your API proxy URL
+// For GitHub Pages: Leave API_PROXY_URL empty and use GitHub Actions to inject API key
+// For Netlify: Set API_PROXY_URL to your Netlify function URL
+
+window.API_PROXY_URL = ''; // e.g., 'https://your-site.netlify.app/.netlify/functions/api-proxy'
+window.API_KEY = ''; // Only use if injecting via build process (GitHub Actions)
+

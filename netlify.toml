@@ -1,0 +1,9 @@
+# Netlify configuration for serverless functions
+[build]
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api-proxy"
+  status = 200
+

@@ -1,0 +1,50 @@
+name: Deploy to GitHub Pages with API Key
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Inject API Key
+        run: |
+          # Create config.js with API key from GitHub Secrets
+          echo "window.API_KEY = '${{ secrets.GOOGLE_SHEETS_API_KEY }}';" > config.js
+          # Note: This still exposes the key in the browser, but keeps it out of the repo
+      
+      - name: Update HTML to include config
+        run: |
+          # Add config.js script tag before app.js if not already present
+          if ! grep -q "config.js" index.html; then
+            sed -i.bak 's|<script src="app.js"></script>|<script src="config.js"></script>\n    <script src="app.js"></script>|' index.html
+            rm index.html.bak
+          fi
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+

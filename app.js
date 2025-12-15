@@ -11,6 +11,27 @@ class TournamentScheduleViewer {
         
         this.initializeEventListeners();
         this.loadSavedSettings();
+        this.checkProxyAvailability();
+    }
+
+    checkProxyAvailability() {
+        // Check if API proxy is configured
+        if (window.API_PROXY_URL) {
+            // Hide API key field if proxy is available
+            const apiKeyGroup = document.querySelector('.form-group:has(#apiKey)');
+            const apiKeyLabel = document.querySelector('label[for="apiKey"]');
+            const apiKeyInput = document.getElementById('apiKey');
+            
+            if (apiKeyGroup) {
+                apiKeyGroup.style.display = 'none';
+            }
+            
+            // Update info text
+            const infoText = document.querySelector('.info-text');
+            if (infoText) {
+                infoText.innerHTML = '<p><strong>API key is configured server-side.</strong> Just enter your Google Sheet URL and click "Load Data".</p>';
+            }
+        }
     }
 
     initializeEventListeners() {
@@ -121,16 +142,27 @@ class TournamentScheduleViewer {
 
     async loadAllData() {
         const sheetUrl = document.getElementById('sheetUrl').value.trim();
-        const apiKey = document.getElementById('apiKey').value.trim();
+        const apiKeyInput = document.getElementById('apiKey');
+        const apiKey = apiKeyInput ? apiKeyInput.value.trim() : '';
+        
+        // Check if proxy is available (API key field might be hidden)
+        const useProxy = window.API_PROXY_URL && !apiKey;
         
         if (!sheetUrl) {
             this.showError('Please enter a Google Sheet URL');
             return;
         }
 
+        if (!useProxy && !apiKey) {
+            this.showError('API key is required. Please enter your Google Sheets API key or configure a proxy.');
+            return;
+        }
+
         // Save settings
         this.saveSheetUrl(sheetUrl);
-        this.saveApiKey(apiKey);
+        if (apiKey) {
+            this.saveApiKey(apiKey);
+        }
         this.sheetUrl = sheetUrl;
         this.apiKey = apiKey;
 
@@ -161,10 +193,12 @@ class TournamentScheduleViewer {
         try {
             let sheetData;
             
-            // Try API method if API key is provided, otherwise try CSV
-            if (apiKey) {
+            // Try API method if API key is provided or proxy is available, otherwise try CSV
+            if (apiKey || window.API_PROXY_URL || window.API_KEY) {
+                // Use API key from config if available
+                const keyToUse = apiKey || window.API_KEY || '';
                 // Load EmceePRT tab
-                sheetData = await this.loadViaAPI(sheetUrl, apiKey, 'EmceePRT');
+                sheetData = await this.loadViaAPI(sheetUrl, keyToUse, 'EmceePRT');
             } else {
                 // Try CSV first
                 try {
@@ -217,9 +251,11 @@ class TournamentScheduleViewer {
             
             let teamSheetData;
             
-            if (apiKey) {
+            if (apiKey || window.API_PROXY_URL || window.API_KEY) {
+                // Use API key from config if available
+                const keyToUse = apiKey || window.API_KEY || '';
                 // Load TeamListbyNumber tab
-                teamSheetData = await this.loadViaAPI(sheetUrl, apiKey, 'TeamListbyNumber');
+                teamSheetData = await this.loadViaAPI(sheetUrl, keyToUse, 'TeamListbyNumber');
             } else {
                 // For CSV, we'd need the GID for TeamListbyNumber tab
                 // For now, skip if no API key
@@ -405,6 +441,10 @@ class TournamentScheduleViewer {
         // Extract sheet ID and GID from URL
         const { sheetId, gid } = this.extractSheetInfo(sheetUrl);
         
+        // Check if we should use proxy API (when API key is not provided but proxy is available)
+        const useProxy = !apiKey && window.API_PROXY_URL;
+        const proxyUrl = window.API_PROXY_URL || '';
+        
         // First, get sheet metadata to find the sheet name from GID
         let sheetName = preferredSheetName || 'Sheet1'; // Default fallback
         const commonSheetNames = preferredSheetName 
@@ -412,9 +452,28 @@ class TournamentScheduleViewer {
             : ['EmceePRT', 'EmceePrt', 'EmceeTablet', 'OfficialSchedule', 'TeamListbyNumber', 'Sheet1'];
         
         try {
-            const metadataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?key=${apiKey}`;
-            const metadataResponse = await fetch(metadataUrl);
-            const metadata = await metadataResponse.json();
+            let metadataUrl, metadataResponse, metadata;
+            
+            if (useProxy) {
+                // Use proxy for metadata - need to get full spreadsheet metadata first
+                // The proxy should handle getting metadata
+                metadataUrl = `${proxyUrl}?sheetId=${sheetId}&action=metadata`;
+            } else {
+                metadataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?key=${apiKey}`;
+            }
+            
+            metadataResponse = await fetch(metadataUrl);
+            const metadataData = await metadataResponse.json();
+            
+            // Handle proxy response format
+            if (useProxy && metadataData.sheets) {
+                metadata = metadataData;
+            } else if (useProxy) {
+                // Proxy might return data directly
+                metadata = { sheets: metadataData.sheets || [] };
+            } else {
+                metadata = metadataData;
+            }
             
             if (metadataResponse.ok && metadata.sheets) {
                 if (gid !== '0' && !preferredSheetName) {
@@ -461,14 +520,22 @@ class TournamentScheduleViewer {
         // Use Google Sheets API v4 to get values
         // Escape sheet name if it contains special characters
         const range = `${sheetName}!A:ZZ`; // Get all columns
-        const apiUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(range)}?key=${apiKey}`;
+        let apiUrl;
+        
+        if (useProxy) {
+            // Use proxy API
+            apiUrl = `${proxyUrl}?sheetId=${sheetId}&sheetName=${encodeURIComponent(sheetName)}&range=${encodeURIComponent(range)}`;
+        } else {
+            // Direct API call with key
+            apiUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(range)}?key=${apiKey}`;
+        }
         
         const response = await fetch(apiUrl);
         const data = await response.json();
         
         if (!response.ok) {
             if (data.error) {
-                throw new Error(`API Error: ${data.error.message}`);
+                throw new Error(`API Error: ${data.error.message || data.error}`);
             }
             throw new Error(`Failed to fetch sheet data: ${response.status} ${response.statusText}`);
         }

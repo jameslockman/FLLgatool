@@ -13,13 +13,18 @@ class TournamentScheduleViewer {
         this.loadSavedSettings();
         
         // Check for API key after DOM is ready and config.js has loaded
-        // Use requestAnimationFrame to ensure config.js has executed
+        // Use multiple checks to ensure config.js has executed
+        this.checkProxyAvailability();
         requestAnimationFrame(() => {
             setTimeout(() => {
                 this.checkProxyAvailability();
                 this.displayLastLoadStatus();
-            }, 50);
+            }, 100);
         });
+        // Also check after a longer delay in case config.js loads slowly
+        setTimeout(() => {
+            this.checkProxyAvailability();
+        }, 500);
     }
 
     displayLastLoadStatus() {
@@ -68,27 +73,39 @@ class TournamentScheduleViewer {
 
     checkProxyAvailability() {
         // Check if API proxy or API key is configured
-        if (window.API_PROXY_URL || window.API_KEY) {
+        const hasApiKey = window.API_PROXY_URL || window.API_KEY;
+        const apiKeyGroup = document.getElementById('apiKeyGroup');
+        
+        if (hasApiKey) {
             // Hide API key field group if proxy or injected key is available
-            const apiKeyGroup = document.getElementById('apiKeyGroup');
-            
             if (apiKeyGroup) {
                 apiKeyGroup.style.display = 'none';
             }
             
-            // Update info text
+            // Update info text (but preserve load status if it exists)
             const infoText = document.querySelector('.info-text');
             if (infoText) {
-                if (window.API_PROXY_URL) {
-                    infoText.innerHTML = '<p><strong>API key is configured server-side.</strong> Just enter your Google Sheet URL and click "Load Data".</p>';
-                } else if (window.API_KEY) {
-                    infoText.innerHTML = '<p><strong>API key is configured.</strong> Just enter your Google Sheet URL and click "Load Data".</p>';
+                const hasLoadStatus = document.getElementById('loadStatus');
+                const existingHTML = infoText.innerHTML;
+                
+                // Only update if we don't already have the API key message
+                if (!existingHTML.includes('API key is configured')) {
+                    const apiKeyMsg = window.API_PROXY_URL 
+                        ? '<p><strong>API key is configured server-side.</strong> Just enter your Google Sheet URL and click "Load Data".</p>'
+                        : '<p><strong>API key is configured.</strong> Just enter your Google Sheet URL and click "Load Data".</p>';
+                    
+                    // Prepend the message, preserving any existing content
+                    infoText.innerHTML = apiKeyMsg + (hasLoadStatus ? existingHTML : '');
                 }
             }
             
-            console.log('API key detected:', window.API_KEY ? 'Yes (from config.js)' : 'No');
+            console.log('API key detected:', window.API_KEY ? 'Yes (from config.js)' : window.API_PROXY_URL ? 'Yes (proxy)' : 'No');
         } else {
             console.log('No API key configured - manual entry required');
+            // Make sure API key field is visible if no key is configured
+            if (apiKeyGroup && apiKeyGroup.style.display === 'none') {
+                apiKeyGroup.style.display = '';
+            }
         }
     }
 

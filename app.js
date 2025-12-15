@@ -46,7 +46,21 @@ class TournamentScheduleViewer {
                 const statusDiv = document.createElement('div');
                 statusDiv.id = 'loadStatus';
                 statusDiv.className = 'load-status';
-                statusDiv.innerHTML = `<p><strong>✓ Data loaded</strong> - Last loaded: ${formattedDate}</p>`;
+                
+                const matchCount = this.matches.length;
+                const teamCount = this.teams.length;
+                let statusText = '<p><strong>✓ Data loaded</strong>';
+                
+                if (matchCount > 0 && teamCount > 0) {
+                    statusText += ` - ${matchCount} match${matchCount !== 1 ? 'es' : ''}, ${teamCount} team${teamCount !== 1 ? 's' : ''}`;
+                } else if (matchCount > 0) {
+                    statusText += ` - ${matchCount} match${matchCount !== 1 ? 'es' : ''}`;
+                } else if (teamCount > 0) {
+                    statusText += ` - ${teamCount} team${teamCount !== 1 ? 's' : ''}`;
+                }
+                
+                statusText += `<br>Last loaded: ${formattedDate}</p>`;
+                statusDiv.innerHTML = statusText;
                 infoText.appendChild(statusDiv);
             }
         }
@@ -233,10 +247,6 @@ class TournamentScheduleViewer {
             console.error('Error:', error);
         } finally {
             document.getElementById('loadingIndicator').classList.add('hidden');
-            // Update load status on success
-            if (this.matches.length > 0 || this.teams.length > 0) {
-                this.updateLoadStatus();
-            }
         }
     }
 
@@ -249,11 +259,13 @@ class TournamentScheduleViewer {
         // Update the status display
         const infoText = document.querySelector('.info-text');
         if (infoText) {
+            // Remove existing status if any
             const existingStatus = document.getElementById('loadStatus');
             if (existingStatus) {
                 existingStatus.remove();
             }
             
+            // Create status div
             const statusDiv = document.createElement('div');
             statusDiv.id = 'loadStatus';
             statusDiv.className = 'load-status';
@@ -267,7 +279,21 @@ class TournamentScheduleViewer {
                 second: '2-digit'
             });
             
-            statusDiv.innerHTML = `<p><strong>✓ Data loaded successfully</strong> - Last loaded: ${formattedDate}</p>`;
+            // Count loaded items
+            const matchCount = this.matches.length;
+            const teamCount = this.teams.length;
+            let statusText = '<p><strong>✓ Data loaded successfully</strong>';
+            
+            if (matchCount > 0 && teamCount > 0) {
+                statusText += ` - ${matchCount} match${matchCount !== 1 ? 'es' : ''}, ${teamCount} team${teamCount !== 1 ? 's' : ''}`;
+            } else if (matchCount > 0) {
+                statusText += ` - ${matchCount} match${matchCount !== 1 ? 'es' : ''}`;
+            } else if (teamCount > 0) {
+                statusText += ` - ${teamCount} team${teamCount !== 1 ? 's' : ''}`;
+            }
+            
+            statusText += `<br>Last loaded: ${formattedDate}</p>`;
+            statusDiv.innerHTML = statusText;
             infoText.appendChild(statusDiv);
         }
     }
@@ -321,6 +347,9 @@ class TournamentScheduleViewer {
             document.getElementById('scheduleView').classList.remove('hidden');
             document.getElementById('matchesEmpty').classList.add('hidden');
             
+            // Update load status on successful match load
+            this.updateLoadStatus();
+            
         } catch (error) {
             console.error('Error loading match data:', error);
             document.getElementById('matchesEmpty').classList.remove('hidden');
@@ -352,6 +381,8 @@ class TournamentScheduleViewer {
                 this.displayTeamList();
                 document.getElementById('teamListContent').classList.remove('hidden');
                 document.getElementById('teamListEmpty').classList.add('hidden');
+                // Update load status on successful team load
+                this.updateLoadStatus();
             } else {
                 document.getElementById('teamListEmpty').classList.remove('hidden');
             }

@@ -1373,14 +1373,30 @@ class TournamentScheduleViewer {
                 
                 group.teams.forEach((team, teamIndex) => {
                     // Format team info with line breaks preserved
-                    // Split by newlines, trim each line, filter empty lines, escape HTML, then join with <br>
-                    const formattedInfo = team.info 
-                        ? team.info.split('\n')
+                    // First line is typically team number (bold), second is team name (bold, 18pt)
+                    let formattedInfo = 'No team info';
+                    
+                    if (team.info) {
+                        const lines = team.info.split('\n')
                             .map(line => line.trim())
-                            .filter(line => line)
-                            .map(line => this.escapeHtml(line))
-                            .join('<br>')
-                        : 'No team info';
+                            .filter(line => line);
+                        
+                        if (lines.length > 0) {
+                            formattedInfo = lines.map((line, index) => {
+                                const escapedLine = this.escapeHtml(line);
+                                if (index === 0) {
+                                    // First line: team number - make it bold
+                                    return `<span class="team-number">${escapedLine}</span>`;
+                                } else if (index === 1) {
+                                    // Second line: team name - make it bold and 18pt
+                                    return `<span class="team-name">${escapedLine}</span>`;
+                                } else {
+                                    // Other lines: regular formatting
+                                    return escapedLine;
+                                }
+                            }).join('<br>');
+                        }
+                    }
                     
                     html += `
                         <div class="team-card">

@@ -11,7 +11,11 @@ class TournamentScheduleViewer {
         
         this.initializeEventListeners();
         this.loadSavedSettings();
-        this.checkProxyAvailability();
+        
+        // Wait a moment for config.js to load, then check
+        setTimeout(() => {
+            this.checkProxyAvailability();
+        }, 100);
     }
 
     checkProxyAvailability() {
@@ -34,6 +38,10 @@ class TournamentScheduleViewer {
                     infoText.innerHTML = '<p><strong>API key is configured.</strong> Just enter your Google Sheet URL and click "Load Data".</p>';
                 }
             }
+            
+            console.log('API key detected:', window.API_KEY ? 'Yes (from config.js)' : 'No');
+        } else {
+            console.log('No API key configured - manual entry required');
         }
     }
 

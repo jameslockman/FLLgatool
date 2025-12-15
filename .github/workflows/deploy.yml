@@ -28,13 +28,14 @@ jobs:
           echo "window.API_KEY = '${{ secrets.GOOGLE_SHEETS_API_KEY }}';" > config.js
           # Note: This still exposes the key in the browser, but keeps it out of the repo
       
-      - name: Update HTML to include config
+      - name: Verify config.js will be loaded
         run: |
-          # Add config.js script tag before app.js if not already present
+          # Verify that index.html includes config.js (it should already be there)
           if ! grep -q "config.js" index.html; then
-            sed -i.bak 's|<script src="app.js"></script>|<script src="config.js"></script>\n    <script src="app.js"></script>|' index.html
-            rm index.html.bak
+            echo "Warning: config.js script tag not found in index.html"
+            exit 1
           fi
+          echo "✓ config.js will be loaded correctly"
       
       - name: Setup Pages
         uses: actions/configure-pages@v4

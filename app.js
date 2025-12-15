@@ -15,11 +15,10 @@ class TournamentScheduleViewer {
     }
 
     checkProxyAvailability() {
-        // Check if API proxy is configured
-        if (window.API_PROXY_URL) {
-            // Hide API key field if proxy is available
+        // Check if API proxy or API key is configured
+        if (window.API_PROXY_URL || window.API_KEY) {
+            // Hide API key field if proxy or injected key is available
             const apiKeyGroup = document.querySelector('.form-group:has(#apiKey)');
-            const apiKeyLabel = document.querySelector('label[for="apiKey"]');
             const apiKeyInput = document.getElementById('apiKey');
             
             if (apiKeyGroup) {
@@ -29,7 +28,11 @@ class TournamentScheduleViewer {
             // Update info text
             const infoText = document.querySelector('.info-text');
             if (infoText) {
-                infoText.innerHTML = '<p><strong>API key is configured server-side.</strong> Just enter your Google Sheet URL and click "Load Data".</p>';
+                if (window.API_PROXY_URL) {
+                    infoText.innerHTML = '<p><strong>API key is configured server-side.</strong> Just enter your Google Sheet URL and click "Load Data".</p>';
+                } else if (window.API_KEY) {
+                    infoText.innerHTML = '<p><strong>API key is configured.</strong> Just enter your Google Sheet URL and click "Load Data".</p>';
+                }
             }
         }
     }
@@ -153,8 +156,11 @@ class TournamentScheduleViewer {
             return;
         }
 
-        if (!useProxy && !apiKey) {
-            this.showError('API key is required. Please enter your Google Sheets API key or configure a proxy.');
+        // Check if we have an API key (from input, config, or proxy)
+        const hasApiKey = apiKey || window.API_KEY || window.API_PROXY_URL;
+        
+        if (!hasApiKey) {
+            this.showError('API key is required. Please enter your Google Sheets API key or configure it server-side.');
             return;
         }
 

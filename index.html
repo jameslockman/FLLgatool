@@ -122,25 +122,8 @@
     </div>
 
     <!-- Configuration: Load config.js if it exists (for API key injection via GitHub Actions) -->
-    <script>
-        // Load config.js and wait for it before loading app.js
-        const configScript = document.createElement('script');
-        configScript.src = 'config.js';
-        configScript.onload = function() {
-            // Config loaded, now initialize the app
-            const appScript = document.createElement('script');
-            appScript.src = 'app.js';
-            document.body.appendChild(appScript);
-        };
-        configScript.onerror = function() {
-            // Config file doesn't exist, that's okay - load app.js anyway
-            console.log('No config.js found, using manual API key entry');
-            const appScript = document.createElement('script');
-            appScript.src = 'app.js';
-            document.body.appendChild(appScript);
-        };
-        document.head.appendChild(configScript);
-    </script>
+    <script src="config.js" onerror="console.log('No config.js found, using manual API key entry');"></script>
+    <script src="app.js"></script>
 </body>
 </html>
 

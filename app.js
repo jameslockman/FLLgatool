@@ -12,10 +12,13 @@ class TournamentScheduleViewer {
         this.initializeEventListeners();
         this.loadSavedSettings();
         
-        // Wait a moment for config.js to load, then check
-        setTimeout(() => {
-            this.checkProxyAvailability();
-        }, 100);
+        // Check for API key after DOM is ready and config.js has loaded
+        // Use requestAnimationFrame to ensure config.js has executed
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                this.checkProxyAvailability();
+            }, 50);
+        });
     }
 
     checkProxyAvailability() {

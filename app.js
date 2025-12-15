@@ -490,6 +490,7 @@ class TournamentScheduleViewer {
                     <div class="team-info">
             `;
             
+            // Only show: Team Name, Organization, City
             if (team.teamName) {
                 html += `
                     <div class="team-info-item">
@@ -508,18 +509,19 @@ class TournamentScheduleViewer {
                 `;
             }
             
-            // Display other data
+            // Look for city in otherData
             if (team.otherData) {
-                Object.entries(team.otherData).forEach(([key, value]) => {
-                    if (value && value.trim()) {
-                        html += `
-                            <div class="team-info-item">
-                                <span class="team-info-label">${this.escapeHtml(key)}:</span>
-                                <span class="team-info-value">${this.escapeHtml(value)}</span>
-                            </div>
-                        `;
-                    }
-                });
+                const cityKey = Object.keys(team.otherData).find(key => 
+                    key.toLowerCase() === 'city'
+                );
+                if (cityKey && team.otherData[cityKey]) {
+                    html += `
+                        <div class="team-info-item">
+                            <span class="team-info-label">City:</span>
+                            <span class="team-info-value">${this.escapeHtml(team.otherData[cityKey])}</span>
+                        </div>
+                    `;
+                }
             }
             
             html += `

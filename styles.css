@@ -451,6 +451,22 @@ header h1 {
     text-decoration: underline;
 }
 
+.load-status {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+}
+
+.load-status p {
+    margin: 0;
+    color: #28a745;
+    font-size: 14px;
+}
+
+.load-status strong {
+    color: #28a745;
+}
+
 /* Team List Styles */
 .team-list-container {
     min-height: 400px;

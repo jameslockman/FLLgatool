@@ -17,8 +17,39 @@ class TournamentScheduleViewer {
         requestAnimationFrame(() => {
             setTimeout(() => {
                 this.checkProxyAvailability();
+                this.displayLastLoadStatus();
             }, 50);
         });
+    }
+
+    displayLastLoadStatus() {
+        // Show last load time if data was previously loaded
+        const lastLoad = localStorage.getItem('fll_last_load');
+        if (lastLoad && (this.matches.length > 0 || this.teams.length > 0)) {
+            const loadDate = new Date(lastLoad);
+            const formattedDate = loadDate.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            const infoText = document.querySelector('.info-text');
+            if (infoText) {
+                const existingStatus = document.getElementById('loadStatus');
+                if (existingStatus) {
+                    existingStatus.remove();
+                }
+                
+                const statusDiv = document.createElement('div');
+                statusDiv.id = 'loadStatus';
+                statusDiv.className = 'load-status';
+                statusDiv.innerHTML = `<p><strong>✓ Data loaded</strong> - Last loaded: ${formattedDate}</p>`;
+                infoText.appendChild(statusDiv);
+            }
+        }
     }
 
     checkProxyAvailability() {
@@ -202,6 +233,42 @@ class TournamentScheduleViewer {
             console.error('Error:', error);
         } finally {
             document.getElementById('loadingIndicator').classList.add('hidden');
+            // Update load status on success
+            if (this.matches.length > 0 || this.teams.length > 0) {
+                this.updateLoadStatus();
+            }
+        }
+    }
+
+    updateLoadStatus() {
+        // Save load timestamp
+        const now = new Date();
+        const timestamp = now.toISOString();
+        localStorage.setItem('fll_last_load', timestamp);
+        
+        // Update the status display
+        const infoText = document.querySelector('.info-text');
+        if (infoText) {
+            const existingStatus = document.getElementById('loadStatus');
+            if (existingStatus) {
+                existingStatus.remove();
+            }
+            
+            const statusDiv = document.createElement('div');
+            statusDiv.id = 'loadStatus';
+            statusDiv.className = 'load-status';
+            
+            const formattedDate = now.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            statusDiv.innerHTML = `<p><strong>✓ Data loaded successfully</strong> - Last loaded: ${formattedDate}</p>`;
+            infoText.appendChild(statusDiv);
         }
     }
 

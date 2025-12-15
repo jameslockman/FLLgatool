@@ -24,9 +24,8 @@ class TournamentScheduleViewer {
     checkProxyAvailability() {
         // Check if API proxy or API key is configured
         if (window.API_PROXY_URL || window.API_KEY) {
-            // Hide API key field if proxy or injected key is available
-            const apiKeyGroup = document.querySelector('.form-group:has(#apiKey)');
-            const apiKeyInput = document.getElementById('apiKey');
+            // Hide API key field group if proxy or injected key is available
+            const apiKeyGroup = document.getElementById('apiKeyGroup');
             
             if (apiKeyGroup) {
                 apiKeyGroup.style.display = 'none';

@@ -438,7 +438,8 @@ class TournamentScheduleViewer {
         // Find team-related columns
         const teamNumberCol = this.findColumn(headers, ['team number', 'teamnumber', 'team #', 'team_num', 'team']);
         const teamNameCol = this.findColumn(headers, ['team name', 'teamname', 'name']);
-        const organizationCol = this.findColumn(headers, ['organization', 'org', 'school', 'institution']);
+        const organizationCol = this.findColumn(headers, ['organization', 'organizatino', 'org', 'school', 'institution']);
+        const cityCol = this.findColumn(headers, ['city']);
         
         data.forEach((row, index) => {
             const team = {
@@ -455,16 +456,14 @@ class TournamentScheduleViewer {
                 team.organization = row[organizationCol] || '';
             }
             
-            // Add all other columns as additional data
+            // Store city separately for easy access
             team.otherData = {};
-            headers.forEach(header => {
-                if (header !== teamNumberCol && header !== teamNameCol && header !== organizationCol) {
-                    const value = row[header];
-                    if (value && value.trim()) {
-                        team.otherData[header] = value;
-                    }
+            if (cityCol) {
+                const cityValue = row[cityCol];
+                if (cityValue && cityValue.trim()) {
+                    team.otherData.city = cityValue.trim();
                 }
-            });
+            }
             
             if (team.teamNumber || team.teamName) {
                 teams.push(team);

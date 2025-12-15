@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLL Tournament Schedule Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>FLL Tournament Schedule Viewer</h1>
+        </header>
+
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="settings">Settings</button>
+            <button class="tab-btn" data-tab="teams">Team List</button>
+            <button class="tab-btn" data-tab="matches">Match Details</button>
+        </div>
+
+        <!-- Tab 1: Settings -->
+        <div id="settingsTab" class="tab-content active">
+            <div class="input-section">
+                <div class="form-group">
+                    <label for="sheetUrl">Google Sheet URL:</label>
+                    <input 
+                        type="text" 
+                        id="sheetUrl" 
+                        placeholder="https://docs.google.com/spreadsheets/d/..."
+                        value="https://docs.google.com/spreadsheets/d/1rOHZJLzb3OuvKYc6HKk3HjqDKQecQaXv3DYn2XAslxs/edit"
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="apiKey">Google API Key (Optional - for private sheets):</label>
+                    <input 
+                        type="password" 
+                        id="apiKey" 
+                        placeholder="Enter your Google Sheets API key (optional)"
+                        value=""
+                    >
+                    <button id="loadBtn" class="btn btn-primary">Load Data</button>
+                </div>
+                <div class="info-text">
+                    <p><strong>For public sheets:</strong> Leave API key empty. Make sure the sheet is set to "Anyone with the link can view".</p>
+                    <p><strong>For private sheets:</strong> Enter a Google Sheets API key. <a href="#" id="apiKeyHelp">Learn how to get an API key</a></p>
+                    <p><em>Your API key will be saved locally in your browser.</em></p>
+                </div>
+            </div>
+
+            <div id="errorMessage" class="error-message hidden"></div>
+            
+            <div id="apiKeyHelpModal" class="modal hidden">
+                <div class="modal-content">
+                    <span class="modal-close">&times;</span>
+                    <h2>How to Get a Google Sheets API Key</h2>
+                    <ol>
+                        <li>Go to <a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud Console</a></li>
+                        <li>Create a new project or select an existing one</li>
+                        <li>Enable the "Google Sheets API" for your project</li>
+                        <li>Go to "Credentials" → "Create Credentials" → "API Key"</li>
+                        <li>Copy the API key and paste it above</li>
+                        <li>(Optional) Restrict the API key to only Google Sheets API for security</li>
+                    </ol>
+                    <p><strong>Note:</strong> The API key allows read-only access to sheets. Keep it secure and don't share it publicly.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Team List -->
+        <div id="teamsTab" class="tab-content">
+            <div id="teamListContainer" class="team-list-container">
+                <div id="teamListLoading" class="loading hidden">
+                    <div class="spinner"></div>
+                    <p>Loading team list...</p>
+                </div>
+                <div id="teamListContent" class="hidden">
+                    <div class="team-list-header">
+                        <h2>Team List</h2>
+                        <input type="text" id="teamSearch" placeholder="Search teams..." class="search-input">
+                    </div>
+                    <div id="teamListGrid" class="team-list-grid">
+                        <!-- Team cards will be displayed here -->
+                    </div>
+                </div>
+                <div id="teamListEmpty" class="empty-state">
+                    <p>No team data loaded. Please configure settings and click "Load Data".</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Match Details -->
+        <div id="matchesTab" class="tab-content">
+            <div id="scheduleView" class="schedule-view hidden">
+                <div class="match-navigation">
+                    <button id="prevBtn" class="btn btn-nav">← Previous Match</button>
+                    <div class="match-selector">
+                        <label for="matchSelect">Match:</label>
+                        <select id="matchSelect" class="match-dropdown">
+                            <option value="">Select a match...</option>
+                        </select>
+                    </div>
+                    <div class="match-counter">
+                        <span id="matchNumber">1</span> of <span id="totalMatches">0</span>
+                    </div>
+                    <button id="nextBtn" class="btn btn-nav">Next Match →</button>
+                </div>
+
+                <div id="matchDetails" class="match-details">
+                    <!-- Match details will be displayed here -->
+                </div>
+            </div>
+            <div id="matchesEmpty" class="empty-state">
+                <p>No match data loaded. Please configure settings and click "Load Data".</p>
+            </div>
+        </div>
+
+        <div id="loadingIndicator" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Loading schedule data...</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+

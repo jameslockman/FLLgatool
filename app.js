@@ -1364,8 +1364,9 @@ class TournamentScheduleViewer {
             
             match.groups.forEach((group, groupIndex) => {
                 const tableDisplay = [group.table1, group.table2].filter(t => t !== null).join(' & ');
+                const groupClass = group.groupNumber === 2 ? 'group-card group-card-2' : 'group-card';
                 html += `
-                    <div class="group-card">
+                    <div class="${groupClass}">
                         <h3>Group ${group.groupNumber}${tableDisplay ? ` (Tables ${tableDisplay})` : ''}</h3>
                         <div class="teams-container">
                 `;

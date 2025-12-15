@@ -266,6 +266,10 @@ header h1 {
     border-left: 4px solid #764ba2;
 }
 
+.group-card-2 {
+    background: rgb(255, 231, 234);
+}
+
 .group-card h3 {
     color: #764ba2;
     margin-bottom: 15px;

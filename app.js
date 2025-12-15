@@ -245,9 +245,49 @@ class TournamentScheduleViewer {
         } catch (error) {
             this.showError(`Error loading data: ${error.message}`);
             console.error('Error:', error);
+            document.getElementById('loadSuccessMessage').classList.add('hidden');
         } finally {
             document.getElementById('loadingIndicator').classList.add('hidden');
+            
+            // Show success message if data was loaded
+            if (this.matches.length > 0 || this.teams.length > 0) {
+                this.showLoadSuccess();
+            }
         }
+    }
+
+    showLoadSuccess() {
+        const successDiv = document.getElementById('loadSuccessMessage');
+        if (!successDiv) return;
+        
+        const now = new Date();
+        const formattedDate = now.toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        
+        const matchCount = this.matches.length;
+        const teamCount = this.teams.length;
+        
+        let message = '<strong>✓ Data loaded successfully!</strong>';
+        if (matchCount > 0 && teamCount > 0) {
+            message += ` Loaded ${matchCount} match${matchCount !== 1 ? 'es' : ''} and ${teamCount} team${teamCount !== 1 ? 's' : ''}.`;
+        } else if (matchCount > 0) {
+            message += ` Loaded ${matchCount} match${matchCount !== 1 ? 'es' : ''}.`;
+        } else if (teamCount > 0) {
+            message += ` Loaded ${teamCount} team${teamCount !== 1 ? 's' : ''}.`;
+        }
+        message += `<br><small>Loaded at: ${formattedDate}</small>`;
+        
+        successDiv.innerHTML = message;
+        successDiv.classList.remove('hidden');
+        
+        // Also update the status in info-text
+        this.updateLoadStatus();
     }
 
     updateLoadStatus() {
@@ -347,9 +387,6 @@ class TournamentScheduleViewer {
             document.getElementById('scheduleView').classList.remove('hidden');
             document.getElementById('matchesEmpty').classList.add('hidden');
             
-            // Update load status on successful match load
-            this.updateLoadStatus();
-            
         } catch (error) {
             console.error('Error loading match data:', error);
             document.getElementById('matchesEmpty').classList.remove('hidden');
@@ -381,8 +418,6 @@ class TournamentScheduleViewer {
                 this.displayTeamList();
                 document.getElementById('teamListContent').classList.remove('hidden');
                 document.getElementById('teamListEmpty').classList.add('hidden');
-                // Update load status on successful team load
-                this.updateLoadStatus();
             } else {
                 document.getElementById('teamListEmpty').classList.remove('hidden');
             }

@@ -39,14 +39,35 @@ class TournamentScheduleViewer {
         const configScript = document.querySelector('script[src="config.js"]');
         if (configScript) {
             configScript.addEventListener('load', () => {
+                console.log('config.js loaded successfully');
                 setTimeout(() => {
                     this.checkProxyAvailability();
                 }, 50);
             });
             configScript.addEventListener('error', () => {
-                console.log('config.js not found - API key field will be visible');
+                console.warn('config.js failed to load - API key field will be visible');
+                // Make sure API key field is visible if config.js fails to load
+                const apiKeyGroup = document.getElementById('apiKeyGroup');
+                if (apiKeyGroup) {
+                    apiKeyGroup.style.display = '';
+                }
             });
+        } else {
+            console.warn('config.js script tag not found in HTML');
         }
+        
+        // Also check periodically in case config.js loads very late
+        let checkCount = 0;
+        const maxChecks = 10;
+        const checkInterval = setInterval(() => {
+            checkCount++;
+            if (window.API_KEY || checkCount >= maxChecks) {
+                this.checkProxyAvailability();
+                if (window.API_KEY || checkCount >= maxChecks) {
+                    clearInterval(checkInterval);
+                }
+            }
+        }, 200);
     }
 
     displayLastLoadStatus() {

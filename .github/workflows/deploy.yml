@@ -25,8 +25,23 @@ jobs:
       - name: Inject API Key
         run: |
           # Create config.js with API key from GitHub Secrets
-          echo "window.API_KEY = '${{ secrets.GOOGLE_SHEETS_API_KEY }}';" > config.js
-          # Note: This still exposes the key in the browser, but keeps it out of the repo
+          if [ -z "${{ secrets.GOOGLE_SHEETS_API_KEY }}" ]; then
+            echo "Warning: GOOGLE_SHEETS_API_KEY secret is not set. Creating empty config.js."
+            echo "// API key not configured - users will need to enter it manually" > config.js
+            echo "window.API_KEY = '';" >> config.js
+          else
+            echo "window.API_KEY = '${{ secrets.GOOGLE_SHEETS_API_KEY }}';" > config.js
+            echo "✓ API key injected successfully"
+          fi
+          # Verify config.js was created
+          if [ ! -f config.js ]; then
+            echo "Error: config.js was not created"
+            exit 1
+          fi
+          echo "✓ config.js created"
+          # Show first few characters (without exposing full key)
+          head -c 50 config.js
+          echo ""
       
       - name: Verify config.js will be loaded
         run: |
@@ -36,6 +51,10 @@ jobs:
             exit 1
           fi
           echo "✓ config.js will be loaded correctly"
+          # Verify config.js exists and has content
+          if [ ! -s config.js ]; then
+            echo "Warning: config.js is empty"
+          fi
       
       - name: Setup Pages
         uses: actions/configure-pages@v4

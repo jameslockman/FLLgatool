@@ -371,6 +371,20 @@ header h1 {
     margin-top: 20px;
 }
 
+@media (max-width: 768px) {
+    .groups-container {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .groups-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
+
 .group-card {
     background: #f0f4ff;
     border-radius: 8px;

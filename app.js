@@ -14,17 +14,39 @@ class TournamentScheduleViewer {
         
         // Check for API key after DOM is ready and config.js has loaded
         // Use multiple checks to ensure config.js has executed
+        // Check immediately
         this.checkProxyAvailability();
+        
+        // Check after a short delay
+        setTimeout(() => {
+            this.checkProxyAvailability();
+        }, 100);
+        
+        // Check after requestAnimationFrame
         requestAnimationFrame(() => {
             setTimeout(() => {
                 this.checkProxyAvailability();
                 this.displayLastLoadStatus();
-            }, 100);
+            }, 200);
         });
+        
         // Also check after a longer delay in case config.js loads slowly
         setTimeout(() => {
             this.checkProxyAvailability();
-        }, 500);
+        }, 1000);
+        
+        // Listen for when config.js script loads
+        const configScript = document.querySelector('script[src="config.js"]');
+        if (configScript) {
+            configScript.addEventListener('load', () => {
+                setTimeout(() => {
+                    this.checkProxyAvailability();
+                }, 50);
+            });
+            configScript.addEventListener('error', () => {
+                console.log('config.js not found - API key field will be visible');
+            });
+        }
     }
 
     displayLastLoadStatus() {
@@ -76,10 +98,18 @@ class TournamentScheduleViewer {
         const hasApiKey = window.API_PROXY_URL || window.API_KEY;
         const apiKeyGroup = document.getElementById('apiKeyGroup');
         
+        console.log('Checking API key availability:', {
+            hasApiKey,
+            API_KEY: window.API_KEY ? 'Set' : 'Not set',
+            API_PROXY_URL: window.API_PROXY_URL || 'Not set',
+            apiKeyGroupExists: !!apiKeyGroup
+        });
+        
         if (hasApiKey) {
             // Hide API key field group if proxy or injected key is available
             if (apiKeyGroup) {
                 apiKeyGroup.style.display = 'none';
+                console.log('API key field hidden');
             }
             
             // Update info text (but preserve load status if it exists)
@@ -98,12 +128,10 @@ class TournamentScheduleViewer {
                     infoText.innerHTML = apiKeyMsg + (hasLoadStatus ? existingHTML : '');
                 }
             }
-            
-            console.log('API key detected:', window.API_KEY ? 'Yes (from config.js)' : window.API_PROXY_URL ? 'Yes (proxy)' : 'No');
         } else {
-            console.log('No API key configured - manual entry required');
+            console.log('No API key configured - showing API key field');
             // Make sure API key field is visible if no key is configured
-            if (apiKeyGroup && apiKeyGroup.style.display === 'none') {
+            if (apiKeyGroup) {
                 apiKeyGroup.style.display = '';
             }
         }

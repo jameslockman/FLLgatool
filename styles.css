@@ -12,6 +12,12 @@ body {
     color: #333;
 }
 
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -31,6 +37,26 @@ header {
 header h1 {
     font-size: 2rem;
     font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    header {
+        padding: 20px 15px;
+    }
+    
+    header h1 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    header {
+        padding: 15px 10px;
+    }
+    
+    header h1 {
+        font-size: 1.25rem;
+    }
 }
 
 /* Tabs */
@@ -55,6 +81,20 @@ header h1 {
     transition: all 0.3s;
 }
 
+@media (max-width: 768px) {
+    .tab-btn {
+        padding: 12px 10px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tab-btn {
+        padding: 10px 5px;
+        font-size: 12px;
+    }
+}
+
 .tab-btn:hover {
     background: #e9ecef;
     color: #495057;
@@ -73,6 +113,18 @@ header h1 {
 
 .tab-content.active {
     display: block;
+}
+
+@media (max-width: 768px) {
+    .tab-content {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tab-content {
+        padding: 15px;
+    }
 }
 
 .input-section {
@@ -106,6 +158,22 @@ header h1 {
     transition: border-color 0.3s;
 }
 
+@media (max-width: 768px) {
+    .form-group input {
+        min-width: 200px;
+        padding: 10px 12px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}
+
+@media (max-width: 480px) {
+    .form-group input {
+        min-width: 100%;
+        padding: 10px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}
+
 .form-group input:focus {
     outline: none;
     border-color: #667eea;
@@ -130,6 +198,14 @@ header h1 {
     cursor: pointer;
     transition: all 0.3s;
     white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+    .btn {
+        padding: 10px 20px;
+        font-size: 14px;
+        width: 100%;
+    }
 }
 
 .btn-primary {
@@ -188,6 +264,20 @@ header h1 {
     gap: 15px;
 }
 
+@media (max-width: 768px) {
+    .match-navigation {
+        padding: 15px;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .match-navigation {
+        padding: 10px;
+        gap: 8px;
+    }
+}
+
 .match-selector {
     display: flex;
     align-items: center;
@@ -207,6 +297,14 @@ header h1 {
     min-width: 150px;
     background: white;
     cursor: pointer;
+}
+
+@media (max-width: 480px) {
+    .match-dropdown {
+        min-width: 120px;
+        font-size: 12px;
+        padding: 6px 8px;
+    }
 }
 
 .match-dropdown:focus {
@@ -250,6 +348,20 @@ header h1 {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
     margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .teams-container {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .teams-container {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
 }
 
 .groups-container {
@@ -528,6 +640,13 @@ header h1 {
     min-width: 250px;
 }
 
+@media (max-width: 480px) {
+    .search-input {
+        min-width: 100%;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}
+
 .search-input:focus {
     outline: none;
     border-color: #667eea;
@@ -537,6 +656,20 @@ header h1 {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .team-list-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .team-list-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
 }
 
 .empty-state {
@@ -555,10 +688,6 @@ header h1 {
         flex-direction: column;
     }
 
-    .form-group input {
-        min-width: 100%;
-    }
-
     .match-navigation {
         flex-direction: column;
         gap: 15px;
@@ -571,14 +700,6 @@ header h1 {
 
     .match-dropdown {
         flex: 1;
-    }
-
-    .teams-container {
-        grid-template-columns: 1fr;
-    }
-    
-    .team-list-grid {
-        grid-template-columns: 1fr;
     }
     
     .team-list-header {
@@ -594,6 +715,86 @@ header h1 {
     .modal-content {
         margin: 10% auto;
         padding: 20px;
+        max-width: 90%;
+    }
+    
+    .match-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .group-card h3 {
+        font-size: 1.1rem;
+    }
+    
+    .team-card h3 {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        border-radius: 0;
+        margin: 0;
+    }
+    
+    .modal-content {
+        margin: 5% auto;
+        padding: 15px;
+        max-width: 95%;
+        border-radius: 8px;
+    }
+    
+    .match-header h2 {
+        font-size: 1.25rem;
+    }
+    
+    .match-info {
+        font-size: 12px;
+    }
+    
+    .group-card {
+        padding: 15px;
+    }
+    
+    .group-card h3 {
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+    
+    .team-card {
+        padding: 15px;
+    }
+    
+    .team-card h3,
+    .team-card h4 {
+        font-size: 1rem;
+    }
+    
+    .team-name {
+        font-size: 16px !important;
+    }
+    
+    .btn-nav {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .match-counter {
+        font-size: 14px;
+    }
+    
+    .success-message {
+        margin: 15px;
+        padding: 12px 15px;
+        font-size: 13px;
+    }
+    
+    .success-message strong {
+        font-size: 14px;
+    }
+    
+    .success-message small {
+        font-size: 11px;
     }
 }
 
